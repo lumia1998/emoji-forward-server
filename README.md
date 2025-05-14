@@ -18,12 +18,12 @@
 
 1. 克隆仓库：
 ```
-   git clone https://github.com/yourusername/image-server.git
-   cd image-server
+git clone https://github.com/yourusername/image-server.git
+cd image-server
 ```
 2.安装依赖:
 ```
-   pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 3.准备表情包集合:
 将示例txt文件拷贝并修改：
@@ -41,8 +41,8 @@ python app.py
 ### docker运行:
 1. 克隆仓库：
 ```
-   git clone https://github.com/yourusername/image-server.git
-   cd image-server
+git clone https://github.com/yourusername/image-server.git
+cd image-server
 ```
 2.构建Docker镜像：
 ```
