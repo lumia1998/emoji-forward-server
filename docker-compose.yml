@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  image-server:
+    build: .
+    ports:
+      - "6667:6667"
+    volumes:
+      - ./image_collections:/app/image_collections
+    restart: unless-stopped
