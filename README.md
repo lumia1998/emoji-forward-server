@@ -37,7 +37,6 @@ cp image_collections/b.txt.example image_collections/b.txt
 4.运行服务:
 ```
 python app.py
-
 ```
 ### docker运行:
 1. 克隆仓库：
