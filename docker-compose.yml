@@ -1,10 +1,21 @@
-version: '3'
+iversion: '3'
 
 services:
   image-server:
     build: .
     ports:
-      - "6667:6667"
+      - "46667:6667"
     volumes:
       - ./image_collections:/app/image_collections
     restart: unless-stopped
+    # 添加环境变量以控制Python行为
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    # 增加健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6667/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s

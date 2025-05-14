@@ -1,14 +1,15 @@
-from flask import Flask, redirect, abort
-import os
-import random
+import logging
+import sys
 
-app = Flask(__name__)
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger(__name__)
 
-# 存储所有txt文件的目录
-TXT_DIR = "image_collections"
-# 缓存各文件的URL列表，避免频繁读取文件
-url_cache = {}
-
+# 在load_image_urls函数中添加更多日志
 def load_image_urls(collection_name):
     """从指定的集合文件中加载图片URL列表"""
     # 如果已经在缓存中，直接返回
@@ -19,6 +20,7 @@ def load_image_urls(collection_name):
     
     # 检查文件是否存在
     if not os.path.exists(file_path):
+        logger.warning(f"Collection file not found: {file_path}")
         return None
     
     # 读取文件中的所有URL
@@ -27,59 +29,25 @@ def load_image_urls(collection_name):
             urls = [line.strip() for line in file if line.strip()]
         # 存入缓存
         url_cache[collection_name] = urls
+        logger.info(f"Loaded collection '{collection_name}' with {len(urls)} URLs")
         return urls
     except Exception as e:
-        print(f"Error loading {file_path}: {e}")
+        logger.error(f"Error loading {file_path}: {e}")
         return None
 
-def reload_all_collections():
-    """重新加载所有集合文件"""
-    global url_cache
-    url_cache = {}
-    
-    if not os.path.exists(TXT_DIR):
-        os.makedirs(TXT_DIR)
-        print(f"Created directory: {TXT_DIR}")
-        return
-    
-    for filename in os.listdir(TXT_DIR):
-        if filename.endswith('.txt'):
-            collection_name = filename[:-4]  # 移除.txt后缀
-            load_image_urls(collection_name)
-    
-    print(f"Loaded {len(url_cache)} image collections")
-
+# 在random_image函数中添加超时处理
 @app.route('/<collection_name>')
 def random_image(collection_name):
     """随机返回指定集合中的一张图片"""
+    logger.info(f"Request for collection: {collection_name}")
+    
     urls = load_image_urls(collection_name)
     
     if not urls:
+        logger.warning(f"Collection '{collection_name}' not found or empty")
         abort(404, description=f"Collection '{collection_name}' not found or empty")
     
     # 随机选择一个URL并重定向
     random_url = random.choice(urls)
+    logger.info(f"Redirecting to: {random_url[:50]}...")  # 只记录URL的前50个字符
     return redirect(random_url)
-
-@app.route('/reload')
-def reload_collections():
-    """重新加载所有集合的端点"""
-    reload_all_collections()
-    return "All collections reloaded successfully"
-
-@app.route('/')
-def index():
-    """显示所有可用的集合"""
-    collections = list(url_cache.keys())
-    html = "<h1>Image Collections Service</h1><ul>"
-    for collection in sorted(collections):
-        html += f'<li><a href="/{collection}">{collection}</a> ({len(url_cache[collection])} images)</li>'
-    html += "</ul>"
-    html += '<p><a href="/reload">Reload all collections</a></p>'
-    return html
-
-if __name__ == '__main__':
-    # 启动前加载所有集合
-    reload_all_collections()
-    # 启动服务器，监听所有网络接口的6667端口
-    app.run(host='0.0.0.0', port=6667)

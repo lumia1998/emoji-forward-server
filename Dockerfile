@@ -18,5 +18,6 @@ COPY image_collections/ image_collections/
 # 暴露端口
 EXPOSE 6667
 
-# 使用Gunicorn运行应用
-CMD ["gunicorn", "--bind", "0.0.0.0:6667", "app:app"]
+# 使用更合适的Gunicorn配置运行应用
+# 增加超时时间，减少工作进程数量，添加访问日志
+CMD ["gunicorn", "--bind", "0.0.0.0:6667", "--timeout", "120", "--workers", "2", "--threads", "2", "--access-logfile", "-", "app:app"]
