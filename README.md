@@ -17,6 +17,40 @@
 ### 本地运行
 
 1. 克隆仓库：
-   ```bash
+```
    git clone https://github.com/yourusername/image-server.git
    cd image-server
+```
+2.安装依赖:
+```
+   pip install -r requirements.txt
+```
+3.准备表情包集合:
+将示例txt文件拷贝并修改：
+```
+cp image_collections/a.txt.example image_collections/a.txt
+cp image_collections/b.txt.example image_collections/b.txt
+```
+
+也可以创建自己的集合，每行一个图片URL
+
+4.运行服务:
+```
+python app.py
+
+```
+### docker运行:
+1. 克隆仓库：
+```
+   git clone https://github.com/yourusername/image-server.git
+   cd image-server
+```
+2.构建Docker镜像：
+```
+docker build -t image-server .
+```
+3.运行Docker容器:
+```
+docker run -d -p 6667:6667 -v $(pwd)/image_collections:/app/image_collections --name image-server image-server
+```
+
